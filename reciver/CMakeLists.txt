@@ -1,14 +1,16 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_executable(reciver_boot
+set(SUB_PROJ_NAME reciver)
+
+add_executable(${SUB_PROJ_NAME}
         boot.c
 )
 
-target_include_directories(reciver_boot PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
+target_include_directories(${SUB_PROJ_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
 
-target_link_libraries(reciver_boot
+target_link_libraries(${SUB_PROJ_NAME}
         pico_cyw43_arch_lwip_threadsafe_background
         pico_stdlib
         )
 
-pico_add_extra_outputs(reciver_boot)
+pico_add_extra_outputs(${SUB_PROJ_NAME})
