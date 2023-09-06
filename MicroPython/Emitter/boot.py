@@ -15,7 +15,7 @@ print("Booting Emitter")
 #=============Preamble=================
 
 # Transmit Options
-dtr = 2 # Data Transfer Rate in bit/s
+dtr = 10 # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -24,9 +24,35 @@ laser = Pin(14, Pin.OUT)
 
 # Network
 SSID = 'Emitter'
+urlEscapeCodes = {
+        "%20":" ",
+        "%3C":"<",
+        "%3E":">",
+        "%23":"#",
+        "%25":"%",
+        "%2B":"+",
+        "%7B":"{",
+        "%7D":"}",
+        "%7C":"|",
+        "%5C":"\\",
+        "%5E":"^",
+        "%7E":"~",
+        "%5B":"[",
+        "%5D":"]",
+        "%60":"'",
+        "%3B":";",
+        "%2F":"/",
+        "%3F":"?",
+        "%3A":":",
+        "%40":"@",
+        "%3D":"=",
+        "%26":"&",
+        "%24":"$",
+        "%0A":"\n",
+        "%0D":"\r",
+    }
 
 #==============Functions==============
-    
 
 # Formats Properties into a Key-Value Mapping
 def getProperties(request):
@@ -38,9 +64,6 @@ def getProperties(request):
     
     raw = raw[1].split(' ', 1)[0]
     
-    # Format back to original String
-    raw = raw.replace('+', ' ')
-    
     raw_list = raw.split('&')
     
     properties = {}
@@ -48,7 +71,11 @@ def getProperties(request):
     # Go through every Property still formatted "key=value"
     for e in raw_list:
         split = e.split("=", 1)
-        properties[split[0]] = split[1]
+        
+        # Unescape the Values
+        value = decodeUrlEscapeCodes(split[1])
+        
+        properties[split[0]] = value
         
     return properties
  
@@ -89,11 +116,72 @@ def send(recived_bytes):
     print("\nFinished sending the Message.")
     onboard_led.off()
 
+# Function that decodes the Header and puts all header-fields in a Dictionary
+def decodeHeader(recived):
+    recived = recived.decode('utf-8')
+    # Splits the Header into its individaul Fields
+    raw_fields = recived.split('\r\n')
+    # Dictonary that contains all Values of the avalibile Http header
+    fields = {}
+    # Add Method (GET or POST) to the fields with the Key of 'method' and remove it form the Array
+    fields['Method'] = raw_fields.pop(0)
+    
+    # Decode every Heder into Field Key and Value
+    for f in raw_fields:
+        # If the String is empty it was just a line feed without Header field
+        if(f is '' or f is ' '):
+            continue
+        
+        f = f.split(': ')
+        fields[f[0]] = f[1]
+    
+    return fields
+
+# Function that gets the requested Path from an Url stripping Propertues and the host address in the process
+def getRequestedPath(url):
+    # Only the Path
+    path = url.split('/')[3]
+    # Remove Properties
+    path = path.split('?')[0]
+    
+    return path
+    
+
+# Function that decodes the escape Sequences used in URL
+def decodeUrlEscapeCodes(string):
+    global urlEscapeCodes
+    # Replace all Plus with white Space
+    string = string.replace('+', ' ')
+    
+    # iterate over String
+    i = 0
+    while i < len(string):
+        # Detected a escape Code
+        if(string[i] is '%'):
+            # Gets the Code as a Substring from the input String
+            code = string[i : i+3]
+            print(code)
+            # Replaces all Codes in case there are more
+            string = string.replace(code, urlEscapeCodes[code])
+            # Adjusts i further by one so the just replaced char dosnt have to be scaned
+            i += 1
+            
+        i += 1
+        
+    # Retruns the unescaped String
+    return string    
+    
 
 # Function that generates a Response Page for the User showing Data
 def generateResponsePage(data, dtr):
-    
-    return ''
+    global response_html
+    # Replace Placeholder with duration of transmission
+    response_html = response_html.replace('{0}', str(len(data) * 8 / dtr) + ' Sekunden')
+    # Replace Placeholder with Data
+    response_html = response_html.replace('{1}', data)
+    # Replace Placeholder with Data Transfer Rate
+    response_html = response_html.replace('{2}', str(dtr) + ' bits/s')
+    return response_html
 
 #================Start================
 
@@ -105,13 +193,21 @@ ap = network.WLAN(network.AP_IF)
 ap.config(essid=SSID, password="emitterAP")
 ap.active(True)
 
-print("Reading index.html")
-html_file = open('index.html')
-html = html_file.read()
-html_file.close()
+# Reading index.html
+print("Reading 'index.html'...")
+form_html_file = open('index.html')
+form_html = form_html_file.read()
+form_html_file.close()
 print("Finished reading")
 
-# Start
+# Reading response.html
+print("Reading 'response.html'...")
+response_html_file = open('response.html')
+response_html = response_html_file.read()
+response_html_file.close()
+print("Finished reading")
+
+print("\n")
 
 # Waiting for AP to be ready
 while ap.active() == False:
@@ -124,39 +220,60 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(('', 80))
 s.listen(5)
 
-
-print("Starting Webserver")
-
+print("Starting Webserver\n")
 while True:
   print("Listening for connection on Port 80...")
   # Wait for a Connection
   conn, addr = s.accept()
   print('Got a connection from {0}'.format(str(addr)))
   request = conn.recv(1024)
-  # Format Properties
-  properties = getProperties(request.decode('ascii'))
   
-  # Checks if Properties were send
-  if(properties == ""):
-      # Return HTML and close Connection
-      conn.send(html)
+  # Decode Header
+  header = decodeHeader(request)
+  
+  print(header['Method'])
+  
+  # Gets the requested File Path if there is one
+  if('Referer' in header.keys()):
+      relPath = getRequestedPath(header['Referer'])
+  else:
+      relPath = ''
+  
+  if relPath is 'response':
+      # Format Properties
+      properties = getProperties(header['Referer'])
+
+      # If there are no properties there is no response Page to be displayed and no data needs to be send
+      if(len(properties) == 0):
+          conn.close()
+          # Continue waiting for next Conections
+          continue
+      
+      print("Got properties: {0}".format(properties))
+
+      # Send HTML with Answer
+      responsePage = generateResponsePage(properties['data'], dtr)
+      
+      conn.send(responsePage)
       conn.close()
-      # Continue waiting for next Conections
+      
+      # Convert to byte Array
+      msg_bytes = bytearray(properties['data'], 'ascii')
+
+      # Append End Symbol
+      msg_bytes.append(END_SYMBOLE)
+              
+      # Send Message via Laser
+      send(msg_bytes)
+      
       continue
-  
-  print("Got properties: {0}".format(properties))
-  
-  # Send HTML with Answer
-  responsePage = generateResponsePage(properties['data'], dtr)
-  
-  conn.send(html)
+            
+  # Default, just return index.html
+  conn.send(form_html)
   conn.close()
   
-  # Convert to byte Array
-  msg_bytes = bytearray(properties['data'], 'ascii')
   
-  # Append End Symbol
-  msg_bytes.append(END_SYMBOLE)
-  
-  # Send Message via Laser
-  send(msg_bytes)
+# TODO
+# Umbauen das nicht auf das Referer Feld geguckt wird sonder auf den Path aus der Method
+# Dann da die Proberties raus
+# Irgendwie diese favicon anfragen abblocken ODER favicon senden

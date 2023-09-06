@@ -4,16 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emitter Send Form</title>
+    <title>Emitter Response</title>
 </head>
 
 <body>
     <h1>Emitter</h1>
-    <p class="info">Dieses Formular ermöglicht die eingabe eines Strings der über den Emitter an den Reciver gesendet wird.</p>
-    <form action="/response">
-        <textarea name="data"></textarea>
-        <input type="submit" value="Submit">
-    </form>
+    <p>Erfolgreiche übertragung an Emitter.</p>
+    <hr>
+    <p>Voraussichtliche Übertragungszeit:</p>
+    <p>{0}</p>
+    <p>Bei einer Übertragungs-geschwindichkeit von:</p>
+    <p>{2}</p>
+    <hr>
+    <p>Zu übertragener Text:</p>
+    <pre>{1}</pre>
+    <hr>
+    <button onclick="window.location.href='./';">
+        Back to Send Form
+    </button>
 </body>
 
 <style>
@@ -35,7 +43,7 @@
         font-size: 2em;
     }
     
-    .info {
+    p {
         width: var(--width);
         text-align: center;
     }
@@ -51,6 +59,14 @@
         width: var(--width);
         height: 20svh;
         font-size: 0.5em;
+    }
+    
+    hr {
+        width: 80%;
+    }
+    
+    button {
+        font-size: 1em;
     }
 </style>
 
