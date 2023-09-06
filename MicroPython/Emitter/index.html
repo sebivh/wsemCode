@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emitter Send Form</title>
+</head>
+<body>
+    <h1>Pico</h1>
+    <p class="info">Dieses Formular ermöglicht die eingabe eines Strings der über den Emitter an den Reciver gesendet wird.</p>
+    <form>
+        <textarea name="data"></textarea>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+
+<style>
+    body
+    {
+    width: 100svw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2em;
+}
+.info
+{
+    width: 40svw;
+    text-align: center;
+}
+form
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+textarea
+{
+    width: 40svw;
+    height: 20svh;
+    font-size: 0.5em;
+    }
+</style>
+</html>
