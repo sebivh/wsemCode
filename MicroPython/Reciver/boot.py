@@ -79,6 +79,8 @@ def reciveMessage(reciver_adc):
     raw_message = bytearray()
     recived_byte = 0
     
+    print("")
+    
     # Only executes if the last Byte was not the End Symbole
     while recived_byte != END_SYMBOLE:
         
@@ -89,12 +91,14 @@ def reciveMessage(reciver_adc):
             
             #Set current Position of byte to read bit
             recived_byte += bit << i
+            print(int(bit), end='')
+            
+            # Wait for the next Bit acording to the Data Transfer Rate
+            time.sleep(1/dtr)
         
         # End Reading Byte, pushing it to Byte Array
         raw_message.append(recived_byte)
-        
-        # Wait for the next Bit acording to the Data Transfer Rate
-        time.sleep(1/dtr)
+        print('\n')
     
     print("Finished Reading Message")
     onboard_led.off()
@@ -112,7 +116,7 @@ def decodeRawMessage2String(raw_message):
 
 # Funktion that watches for the first high bit of a new Message
 def watchMessageInit(timer):
-    global adc, SENSOR_THRESHOLD, indicator_led
+    global adc, SENSOR_THRESHOLD, indicator_led, dtr, time
     reading = adc.read_u16() * ADC_CONV_FACTOR
     
     #Set LED to Value
@@ -121,18 +125,23 @@ def watchMessageInit(timer):
     if reading >= SENSOR_THRESHOLD:
         
         #==================Init Pin Recived=============
-        print("Threshold of {0}V overcome with {1}V".format(SENSOR_THRESHOLD, reading))
+        print("Threshold of {0}V overcome with {1}V. Start reading".format(SENSOR_THRESHOLD, reading))
+        # Waiting for init Bit
+        time.sleep(1/dtr)
+        
         recived = reciveMessage(adc)
         
         # Decode Message
         msg = decodeRawMessage2String(recived)
-
+        
+        print(msg)
+    
 
 
 #================Start================
 
 # Setup
-autoSetThreshold()
+autoSetThreshold(0.35)
 
 # Start
 main.init(mode=Timer.PERIODIC, period=int(dtr/2 * 1000), callback=watchMessageInit)
