@@ -298,13 +298,11 @@ def send(recived_bytes):
     for byte in recived_bytes:
         print("Byte: '{1}' ({0})".format(byte, chr(byte)))
         
-        filter = int('00000001', 2)
-        
-        # Cycle through byte
+        # Cycle through byte, start by highest
         for i in range(8):
             
             # Sees if bit i is set, returns true if set
-            bit = byte & filter<<i != 0
+            bit = (byte & 1<<(7 - i)) != 0
             
             print("{0}".format(int(bit)), end='')
             
