@@ -12,6 +12,8 @@ print("Booting Reciver")
 
 #=============Preamble=================
 
+msg_history = []
+
 # Consts
 ADC_CONV_FACTOR = 3.3/65535
 SENSOR_THRESHOLD = 1
@@ -84,13 +86,16 @@ def reciveMessage(reciver_adc):
     # Only executes if the last Byte was not the End Symbole
     while recived_byte != END_SYMBOLE:
         
+        # Resetting recived Byte
+        recived_byte = 0
+        
         # Start reading Byte
         for i in range(8):        
             volt_read = reciver_adc.read_u16() * ADC_CONV_FACTOR
             bit =  volt_read >= SENSOR_THRESHOLD
             
-            #Set current Position of byte to read bit
-            recived_byte += bit << i
+            #Set current Position of byte to read bit, starting with highest
+            recived_byte += bit << (7 - i)
             print(int(bit), end='')
             
             # Wait for the next Bit acording to the Data Transfer Rate
@@ -98,10 +103,15 @@ def reciveMessage(reciver_adc):
         
         # End Reading Byte, pushing it to Byte Array
         raw_message.append(recived_byte)
+        print("\nByte: '{1}' ({0})".format(recived_byte, chr(recived_byte)))
+        
         print('\n')
     
     print("Finished Reading Message")
     onboard_led.off()
+    
+    # Slice the end Symbole of the Message
+    raw_message = raw_message[:-1]
     
     # Save to File
     
@@ -110,7 +120,7 @@ def reciveMessage(reciver_adc):
     
 # Decodes Message to a String using Ascii
 def decodeRawMessage2String(raw_message):
-    return raw_message.decode(encoding='ascii')
+    return raw_message.decode('ascii')
 
 
 
@@ -134,7 +144,10 @@ def watchMessageInit(timer):
         # Decode Message
         msg = decodeRawMessage2String(recived)
         
-        print(msg)
+        print('Recived Message:\n "{0}"'.format(msg))
+        
+        # Add Message to History
+        msg_history.aappend(msg)
     
 
 

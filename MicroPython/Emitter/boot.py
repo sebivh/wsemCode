@@ -482,8 +482,5 @@ while True :
   conn.send(form_html)
   conn.close()
   
-  
-# TODO
-# Umbauen das nicht auf das Referer Feld geguckt wird sonder auf den Path aus der Method
-# Dann da die Proberties raus
-# Irgendwie diese favicon anfragen abblocken ODER favicon senden
+#TODO
+# Use Timer to send on another "Thread"
