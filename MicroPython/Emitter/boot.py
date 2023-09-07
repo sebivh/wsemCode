@@ -15,7 +15,7 @@ print("Booting Emitter")
 #=============Preamble=================
 
 # Transmit Options
-dtr = 1 # Data Transfer Rate in bit/s
+dtr = 8 # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -263,7 +263,7 @@ def getProperties(request):
     
     # Check if there are Properties if not retrun empty String
     if(len(raw) < 2):
-        return ''
+        return {}
     
     raw = raw[1].split(' ', 1)[0]
     
@@ -273,6 +273,7 @@ def getProperties(request):
     
     # Go through every Property still formatted "key=value"
     for e in raw_list:
+        
         split = e.split("=", 1)
         
         # Unescape the Values
@@ -451,6 +452,8 @@ while True :
       # Format Properties
       properties = getProperties(header['Request_target'])
       
+      print(properties)
+      
       # If there is no Data to be Send there is no response Site to display, ignoring Request
       if('data' not in properties.keys()):
           print("No Data! Ignoring Request!")
@@ -477,10 +480,40 @@ while True :
       
       # Skip Default and Wait for next Connection
       continue
-            
+  
+  # Settings Page
+  if path is '/settings':
+      # Format Properties
+      properties = getProperties(header['Request_target'])
+      
+      setSettings = properties.keys()
+      
+      # Set all Settings
+      if('adjust_mode' in setSettings): # Ajustier Modus
+          state = properties['adjust_mode'] is 'on'
+          laser.value(state)
+          indicator_led.value(state)
+          print("Setting Adjust Mode to {0}".format(state))
+          
+      if('dtr' in setSettings): # Data Transfer Rate
+          value = int(properties['dtr'])
+          # Data Transfer Rate must be grater than 0
+          if value > 0:
+              dtr = value
+              print("Set Data Transfer Rate to {0}".format(dtr))
+      
+      # Read settings.html
+      settings_file = open('settings.html')
+      response = settings_file.read()
+      settings_file.close()
+      
+      # Return Connection
+      conn.send(response)
+      conn.close()
+      
+      # Skip Default and Wait for next Connection
+      continue
+  
   # Default
   conn.send(form_html)
   conn.close()
-  
-#TODO
-# Use Timer to send on another "Thread"

@@ -5,7 +5,7 @@
 # |_| \_\\___| \___||_|  \_/  \___||_|   
 #                                        
 
-from machine import Pin, ADC, Timer
+from machine import Pin, ADC
 import time
 
 print("Booting Reciver")
@@ -19,7 +19,7 @@ ADC_CONV_FACTOR = 3.3/65535
 SENSOR_THRESHOLD = 1
 
 # Transmit Options
-dtr = 1 # Data Transfer Rate in bit/s
+dtr = 8 # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -28,9 +28,6 @@ onboard_led = Pin("LED", Pin.OUT)
 adc_pin = Pin(26, mode=Pin.IN)
 #adc_pin = Pin(28, mode=Pin.IN)
 adc = ADC(adc_pin)
-
-# Timer
-main = Timer()
 
 #=============Functions=================
 
@@ -43,7 +40,7 @@ def autoSetThreshold(overwrite=-1):
         
     else:
         reading_max = 0
-        reading_resolution = 120
+        reading_resolution = 100
         
         print("Start reading threshold")
         
@@ -60,12 +57,12 @@ def autoSetThreshold(overwrite=-1):
                 reading_max = reading
             
             indicator_led.off()
-            time.sleep(0.5)
+            time.sleep(1/dtr)
         
         print("Reading Stoped. Max reading of {0}V.".format(reading_max * ADC_CONV_FACTOR))
         
         # Sets Sensor to 110% of the max
-        SENSOR_THRESHOLD = 1.1 * reading_max * ADC_CONV_FACTOR
+        SENSOR_THRESHOLD = 1.5 * reading_max * ADC_CONV_FACTOR
     
     print("Set Threshold to {0}V".format(SENSOR_THRESHOLD))
 
@@ -123,10 +120,14 @@ def decodeRawMessage2String(raw_message):
     return raw_message.decode('ascii')
 
 
+#================Start================
 
-# Funktion that watches for the first high bit of a new Message
-def watchMessageInit(timer):
-    global adc, SENSOR_THRESHOLD, indicator_led, dtr, time
+onboard_led.off()
+
+# Setup
+autoSetThreshold(0.32)
+
+while True:
     reading = adc.read_u16() * ADC_CONV_FACTOR
     
     #Set LED to Value
@@ -147,17 +148,6 @@ def watchMessageInit(timer):
         print('Recived Message:\n "{0}"'.format(msg))
         
         # Add Message to History
-        msg_history.aappend(msg)
+        msg_history.append(msg)
     
-
-
-#================Start================
-
-# Setup
-autoSetThreshold(0.35)
-
-# Start
-main.init(mode=Timer.PERIODIC, period=int(dtr/2 * 1000), callback=watchMessageInit)
-
-while True:
-    time.sleep(1)
+    time.sleep(1/(4*dtr))

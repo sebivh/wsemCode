@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emitter Response</title>
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+    <h1>Emitter</h1>
+    <h3>Einstellungen</h3>
+    <form action="">
+        <fieldset>
+            <legend>Ajustier Modus:</legend>
+            <input type="radio" id="contactChoice1" name="adjust_mode" value="on" />
+            <label for="contactChoice1">On</label>
+            <input type="radio" id="contactChoice2" name="adjust_mode" value="off" checked />
+            <label for="contactChoice2">Off</label>
+        </fieldset>
+        <label for="number">Data Transfer Rate:</label>
+        <input type="number" name="dtr">
+        <button type="submit">Submit</button>
+    </form>
+    <button onclick="window.location.href='./';">
+        Back to Send Form
+    </button>
+</body>
+
+<style>
+     :root {
+        --width: 40svw
+    }
+    
+    @media only screen and (max-width: 600px) {
+         :root {
+            --width: 90svw
+        }
+    }
+    
+    body {
+        width: 100svw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 2em;
+        gap: 20px;
+    }
+    
+    p {
+        width: var(--width);
+        text-align: center;
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    
+    textarea {
+        width: var(--width);
+        height: 20svh;
+        font-size: 0.5em;
+    }
+    
+    hr {
+        width: 80%;
+    }
+    
+    button {
+        font-size: 1em;
+    }
+</style>
+
+</html>
