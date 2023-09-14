@@ -4,22 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receiver Status Page</title>
+    <title>Emitter | History</title>
     <link rel="icon" href="data:,">
 </head>
 
 <body>
-    <h1>Receiver</h1>
-    <p>Auf dieser Seite werden die Status Informationen des Receiver angezeigt</p>
+    <h1>Reciver</h1>
+    <p>Auf dieser Seite werden die letzten Übertragungen angezeigt</p>
     <hr>
-    <p>Empfängt gerade: {is_reading}</p>
-    <p>Data Transmission Rate:</p>
-    <pre>{dtr} bit/s</pre>
+    <a href="history/csv">CSV-Datei</a>
     <hr>
-    <div style="height: 20px;"></div>
-    <a href="settings">Einstellungen</a>
-    <div style="height: 20px;"></div>
-    <a href="history">History</a>
+    <a href="/">Startseite</a>
+    <hr>
+    <h2>Letzte 5 Übertragungen:</h2>
+    <div class="historyContainer">
+        {history}
+    </div>
+
 </body>
 
 <style>
@@ -43,8 +44,9 @@
         font-size: 2em;
     }
     
-    *>hr {
-        width: var(--width);
+    hr {
+        position: relative;
+        width: 100%;
     }
     
     p {
@@ -76,6 +78,18 @@
         text-align: center;
         border: 1px solid black;
         text-decoration: none;
+    }
+    
+    .historyContainer {
+        width: calc(0.95 * var(--width));
+    }
+    
+    .historyContainer p {
+        text-align: center;
+        font-size: 1rem;
+        position: relative;
+        width: 100%;
+        padding: 10px 0;
     }
 </style>
 

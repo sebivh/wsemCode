@@ -11,6 +11,7 @@
 <body>
     <h1>Emitter</h1>
     <h3>Einstellungen</h3>
+    <hr>
     <form action="">
         <fieldset>
             <legend>Ajustier Modus:</legend>
@@ -20,12 +21,11 @@
             <label for="contactChoice2">Off</label>
         </fieldset>
         <label for="number">Data Transfer Rate:</label>
-        <input type="number" name="dtr">
+        <input type="number" name="dtr" value="{dtr}" style="font-size: 2rem; text-align: center; width: var(--width);">
         <button type="submit">Submit</button>
     </form>
-    <button onclick="window.location.href='./';">
-        Back to Send Form
-    </button>
+    <hr>
+    <a href="/">Startseite</a>
 </body>
 
 <style>
@@ -41,6 +41,7 @@
     
     body {
         margin: 0;
+        margin-bottom: 40px;
         width: 100svw;
         display: flex;
         flex-direction: column;
@@ -68,11 +69,20 @@
     }
     
     hr {
-        width: 80%;
+        width: var(--width);
     }
     
     button {
         font-size: 1em;
+        width: var(--width);
+    }
+    
+    a {
+        display: inline-block;
+        width: var(--width);
+        text-align: center;
+        border: 1px solid black;
+        text-decoration: none;
     }
 </style>
 

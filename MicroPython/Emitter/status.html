@@ -9,17 +9,19 @@
 </head>
 
 <body>
-    <h1>Receiver</h1>
-    <p>Auf dieser Seite werden die Status Informationen des Receiver angezeigt</p>
+    <h1>Emitter</h1>
+    <p>Auf dieser Seite werden die Status Informationen des Emitters angezeigt</p>
     <hr>
-    <p>Empfängt gerade: {is_reading}</p>
+    <p>Sendet gerade: {is_emitting}</p>
+    <p>Text der Gerade gesendet wird:</p>
+    <pre>{text}</pre>
+    <p>Übrige Übertragungszeit:</p>
+    <pre>{time_remaining}</pre>
     <p>Data Transmission Rate:</p>
     <pre>{dtr} bit/s</pre>
     <hr>
     <div style="height: 20px;"></div>
-    <a href="settings">Einstellungen</a>
-    <div style="height: 20px;"></div>
-    <a href="history">History</a>
+    <a href="/">Startseite</a>
 </body>
 
 <style>
@@ -43,7 +45,7 @@
         font-size: 2em;
     }
     
-    *>hr {
+    hr {
         width: var(--width);
     }
     

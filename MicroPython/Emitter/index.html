@@ -11,10 +11,18 @@
 <body>
     <h1>Emitter</h1>
     <p class="info">Dieses Formular ermöglicht die eingabe eines Strings der über den Emitter an den Reciver gesendet wird.</p>
+    <hr>
     <form action="/response">
         <textarea name="data"></textarea>
         <input type="submit" value="Submit">
     </form>
+    <hr>
+    <div style="height: 20px;"></div>
+    <a href="settings">Einstellungen</a>
+    <div style="height: 20px;"></div>
+    <a href="status">Status</a>
+    <div style="height: 20px;"></div>
+    <a href="history">History</a>
 </body>
 
 <style>
@@ -30,6 +38,7 @@
     
     body {
         margin: 0;
+        margin-bottom: 40px;
         width: 100svw;
         display: flex;
         flex-direction: column;
@@ -58,6 +67,18 @@
     
     input {
         font-size: 1em;
+    }
+    
+    a {
+        display: inline-block;
+        width: 90%;
+        text-align: center;
+        border: 1px solid black;
+        text-decoration: none;
+    }
+    
+    hr {
+        width: 80%;
     }
 </style>
 

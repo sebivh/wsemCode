@@ -4,22 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receiver Status Page</title>
+    <title>Emitter Response</title>
     <link rel="icon" href="data:,">
 </head>
 
 <body>
-    <h1>Receiver</h1>
-    <p>Auf dieser Seite werden die Status Informationen des Receiver angezeigt</p>
+    <h1>Emitter</h1>
+    <h3>Einstellungen</h3>
     <hr>
-    <p>Empfängt gerade: {is_reading}</p>
-    <p>Data Transmission Rate:</p>
-    <pre>{dtr} bit/s</pre>
+    <form action="">
+        <label for="number">Data Transfer Rate in bit/s:</label>
+        <input type="number" name="dtr" value="{dtr}" style="font-size: 2rem; text-align: center; width: var(--width);">
+        <label for="number">Sensor Threshold in Volts</label>
+        <input type="number" name="threshold" value="{threshold}" style="font-size: 2rem; text-align: center; width: var(--width);">
+        <button type="submit">Submit</button>
+    </form>
     <hr>
-    <div style="height: 20px;"></div>
-    <a href="settings">Einstellungen</a>
-    <div style="height: 20px;"></div>
-    <a href="history">History</a>
+    <a href="/">Startseite</a>
 </body>
 
 <style>
@@ -41,10 +42,7 @@
         flex-direction: column;
         align-items: center;
         font-size: 2em;
-    }
-    
-    *>hr {
-        width: var(--width);
+        gap: 20px;
     }
     
     p {
@@ -63,11 +61,15 @@
         width: var(--width);
         height: 20svh;
         font-size: 0.5em;
-        white-space: pre-wrap;
     }
     
-    input {
+    hr {
+        width: var(--width);
+    }
+    
+    button {
         font-size: 1em;
+        width: var(--width);
     }
     
     a {

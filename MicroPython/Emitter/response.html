@@ -13,16 +13,15 @@
     <p>Erfolgreiche übertragung an Emitter.</p>
     <hr>
     <p>Voraussichtliche Übertragungszeit:</p>
-    <p>{0}</p>
+    <p>{time}</p>
     <p>Bei einer Übertragungs-geschwindichkeit von:</p>
-    <p>{2}</p>
+    <p>{dtr}</p>
     <hr>
     <p>Zu übertragener Text:</p>
-    <pre>{1}</pre>
+    <pre>{text}</pre>
     <hr>
-    <button onclick="window.location.href='./';">
-        Back to Send Form
-    </button>
+    <hr>
+    <a href="/">Startseite</a>
 </body>
 
 <style>
@@ -39,6 +38,7 @@
     body {
         margin: 0;
         width: 100svw;
+        margin-bottom: 40px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -69,6 +69,14 @@
     
     button {
         font-size: 1em;
+    }
+    
+    a {
+        display: inline-block;
+        width: var(--width);
+        text-align: center;
+        border: 1px solid black;
+        text-decoration: none;
     }
 </style>
 
