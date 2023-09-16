@@ -247,10 +247,6 @@ def generateResponse(body, page_data={}):
     
     return response
 
-# Decodes Message to a String using Ascii
-def decodeRawMessage2String(raw_message):
-    return raw_message.decode('ascii')
-
 # Formats Properties into a Key-Value Mapping
 def getProperties(request):
     raw = request.split('?', 1)
@@ -284,7 +280,11 @@ def decodeHeader(recived):
     # Split into header and Content
     recived = recived.split('\r\n\r\n')
     header = recived[0]
-    content = recived[1]
+    # If ther is no empty line, no content got transmittet -> empty
+    if len(recived) > 1:
+        content = recived[1]
+    else:
+        content = ''
     
     # Splits the Header into its individaul Fields
     raw_fields = header.split('\r\n')
@@ -300,11 +300,6 @@ def decodeHeader(recived):
     
     # Decode every Heder into Field Key and Value
     for f in raw_fields:
-        # If the String is empty it was just a line feed without Header field, this marks the begining of the Content
-        if(f is ''):
-            
-            break
-        
         f = f.split(': ')
         fields[f[0]] = f[1]
     
@@ -334,7 +329,6 @@ def decodeUrlEscapeCodes(string):
 # Start WebServer and Serve Connections
 def start(generate_response):
     try:
-
         # Starting Web Service
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(('', 80))
@@ -345,7 +339,16 @@ def start(generate_response):
           print("Listening for connection on Port 80...")
           # Wait for a Connection
           conn, addr = s.accept()
-          request = conn.recv(1024)
+          print('Got a connection from {0}'.format(addr[0]))
+          
+          request = bytearray()
+          # Recive all Chunks of the Stream
+          while True: 
+            chunk = conn.recv(1024)
+            request.extend(chunk)
+            
+            if chunk.endswith('\r\n'):
+                break
           
           # Decode Headers of request
           header = decodeHeader(request)
@@ -353,7 +356,7 @@ def start(generate_response):
           # Get the Requested Path
           path = getRequestedPath(header['Request_target'])
           
-          print('Got a connection from {0} requesting "{1}"'.format(addr[0], path))
+          print('Connection requesting "{0}"'.format(path))
           
           # Format Properties
           properties = getProperties(header['Request_target'])

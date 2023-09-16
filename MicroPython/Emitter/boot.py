@@ -79,8 +79,9 @@ def webResponseGenerator(header, path, properties):
     if path is '/response':
       
       if is_emitting:
-          print("Allready Transmitting, not Sending Definition")
-          return 'Allready Transmitting'
+          # Redirekt to Status Page
+          print("Allready Transmitting, Redirektion to Status Page")
+          return 'HTTP/1.1 303 Allready Transmitting\r\nLocation: /status\r\n\r\n'
       
       # If there is no Data to be Send there is no response Site to display, ignoring Request
       if('data' not in properties.keys()):
@@ -131,8 +132,9 @@ def webResponseGenerator(header, path, properties):
           indicator_led.value(state)
           print("Setting Adjust Mode to {0}".format(state))
           
-      if('dtr' in setSettings): # Data Transfer Rate
-          value = int(properties['dtr'])
+      if('dtr' in setSettings and properties['dtr'] != ''): # Data Transfer Rate
+          
+          value = float(properties['dtr'])
           # Data Transfer Rate must be grater than 0
           if value > 0:
               dtr = value

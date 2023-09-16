@@ -73,16 +73,19 @@ def autoSetThreshold(overwrite=-1):
         print("Reading Stoped. Max reading of {0}V.".format(reading_max * ADC_CONV_FACTOR))
         
         # Sets Sensor to 110% of the max
-        SENSOR_THRESHOLD = 1.5 * reading_max * ADC_CONV_FACTOR
+        SENSOR_THRESHOLD = 1.1 * reading_max * ADC_CONV_FACTOR
     
     print("Set Threshold to {0}V".format(SENSOR_THRESHOLD))
 
 
 # Function that safes all recived Data as a .csv file 
-def saveData(byte_array):
+def save_data(byte_array):
     file = open(DATA_FILE_PATH, 'a')
     
-    encoded_msg = byte_array.decode('ascii')
+    try:
+        encoded_msg = byte_array.decode('ascii')
+    except:
+        encoded_msg = "[Error] No Encoding with Ascii Possibile"
     msg_len = len(byte_array)
     
     # Escape msg
@@ -158,6 +161,9 @@ def reciveMessage(reciver_adc):
     
 #
 def start_reciving_message():
+    
+    autoSetThreshold()
+    
     while True:
         reading = adc.read_u16() * ADC_CONV_FACTOR
         
@@ -177,13 +183,13 @@ def start_reciving_message():
             save_data(recived)
             
             # Decode Message
-            msg = decodeRawMessage2String(recived)
-            print('Recived Message:\n "{0}"'.format(msg))
+            try:
+                msg = recived.decode('ascii')
+                print('Recived Message:\n "{0}"'.format(msg))
+            except:
+                print('Recived Message couldnt be decoded using Ascii')
             
             is_reading = False
-            
-            # Add Message to History
-            msg_history.append(msg)
         
         time.sleep(1/(4*dtr))
 
@@ -195,15 +201,15 @@ def webResponseGenerator(header, path, properties):
           
         setSettings = properties.keys()
               
-        if('dtr' in setSettings): # Data Transfer Rate
-            value = int(properties['dtr'])
+        if('dtr' in setSettings and properties['dtr'] != ''): # Data Transfer Rate
+            value = float(properties['dtr'])
             # Data Transfer Rate must be grater than 0
             if value > 0:
                 dtr = value
                 print("Set Data Transfer Rate to {0}".format(dtr))
                 
         if('threshold' in setSettings): # Threshold
-            SENSOR_THRESHOLD = int(properties['threshold'])
+            SENSOR_THRESHOLD = float(properties['threshold'])
             print("Set Threshold to {0}".format(SENSOR_THRESHOLD))
           
         # Read settings.html
@@ -240,18 +246,36 @@ def webResponseGenerator(header, path, properties):
         history_file.close()
         
         # Reading csv File
-        csv_file = open(DATA_FILE_PATH)
+        csv_file = open('data.csv')
         data = csv_file.read()
         csv_file.close()
-        
+
         # Generate History
-        lines = data.split("\r\n")[2:]
-        
+        lines = data.split("\r\n")[-6:]
+
         histroy = ""
-        
+
+        quoted = False
+
         for l in lines[:5]:
-            rows = l.split(",")
-            histroy = histroy + '<hr\r\n><p class="entry">{0}</p>'.format(rows[0])
+            collum = ""
+            
+            print(l)
+            
+            # Read the First Collum
+            for c in l:
+                # Check for Quotes
+                if c == '"':
+                  quoted = not quoted
+                  
+                #Add read Charakter to string
+                collum = collum + c
+                
+                if not quoted and c == ',':
+                    # Finished reading the first Collum, exiting the loop
+                    break
+            
+            histroy = histroy + '\r\n<hr>\r\n<p class="entry">{0}</p>'.format(collum)
         
         page_data = {
                 "history":histroy
@@ -289,8 +313,6 @@ try:
       pass
     print ('AP Mode Is Active, You can Now Connect')
     print('IP Address To Connect to:: ' + ap.ifconfig () [0])
-
-    autoSetThreshold()
 
     # Start Webserver on main Thread
     Webserver.start(webResponseGenerator)
