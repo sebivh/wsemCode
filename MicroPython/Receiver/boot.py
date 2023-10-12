@@ -25,7 +25,7 @@ DATA_FILE_PATH = "data.csv"
 
 # Transmit Options
 is_reading = False
-dtr = 8 # Data Transfer Rate in bit/s
+dtr = 16 # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -68,7 +68,7 @@ def autoSetThreshold(overwrite=-1):
                 reading_max = reading
             
             indicator_led.off()
-            time.sleep(1/dtr)
+            time.sleep(1/8)
         
         print("Reading Stoped. Max reading of {0}V.".format(reading_max * ADC_CONV_FACTOR))
         
@@ -113,15 +113,22 @@ def reciveMessage(reciver_adc):
     global END_SYMBOLE, dtr, ADC_CONV_FACTOR, SENSOR_THRESHOLD, onboard_led, button
     
     print("Recording Message")
-    onboard_led.on()
+    #onboard_led.on()
     
     raw_message = bytearray()
     recived_byte = 0
     
-    print("")
-    
     # Only executes if the last Byte was not the End Symbole
     while recived_byte != END_SYMBOLE:
+        
+        print("Wainting for Package Indicator")
+        # Wait for Package Indicator Bit
+        while ((reciver_adc.read_u16() * ADC_CONV_FACTOR) <= SENSOR_THRESHOLD):
+            continue 
+        print("New Package:")
+        
+        # Waiting
+        time.sleep(1/dtr)
         
         # Resetting recived Byte
         recived_byte = 0
@@ -135,7 +142,7 @@ def reciveMessage(reciver_adc):
                 
             
             volt_read = reciver_adc.read_u16() * ADC_CONV_FACTOR
-            bit =  volt_read >= SENSOR_THRESHOLD
+            bit =  volt_read > SENSOR_THRESHOLD
             
             #Set current Position of byte to read bit, starting with highest
             recived_byte += bit << (7 - i)
@@ -145,13 +152,15 @@ def reciveMessage(reciver_adc):
             time.sleep(1/dtr)
         
         # End Reading Byte, pushing it to Byte Array
+        start = time.time_ns()
         raw_message.append(recived_byte)
+        print("{0} Nanosekunden".format(time.time_ns() - start))
         print("\nByte: '{1}' ({0})".format(recived_byte, chr(recived_byte)))
         
         print('\n')
     
     print("Finished Reading Message")
-    onboard_led.off()
+    #onboard_led.off()
     
     # Slice the end Symbole of the Message
     raw_message = raw_message[:-1]
@@ -162,6 +171,7 @@ def reciveMessage(reciver_adc):
 #
 def start_reciving_message():
     
+    # Set Threshold according to sourunding Messurments
     autoSetThreshold()
     
     while True:
@@ -174,9 +184,8 @@ def start_reciving_message():
             #==================Init Pin Recived=============
             print("Threshold of {0}V overcome with {1}V. Start reading".format(SENSOR_THRESHOLD, reading))
             is_reading = True
-            # Waiting for init Bit
-            time.sleep(1/dtr)
             
+            # Recive the Data Packadge wise
             recived = reciveMessage(adc)
             
             # Save to File
@@ -299,7 +308,7 @@ def webResponseGenerator(header, path, properties):
 
 try:
     onboard_led.off()
-
+    
     # Setup
     ap = network.WLAN(network.AP_IF)
     ap.config(essid=SSID, password=PASSWORD)

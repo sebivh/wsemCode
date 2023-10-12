@@ -40,13 +40,16 @@ def send(recived_bytes):
     print("Start sending Message over Laser. Aproximate Duration: {0}s".format(len(recived_bytes) * 8 /dtr))
     #onboard_led.on() // Cant Turn on the Onboard LED on becouse the Web Server would crash
     
-    # Send activation bit to start reading on the Reciver
-    laser.on()
-    time.sleep(1/dtr)
-    
     print("\n")
     # Cycle through bytes
     for byte in recived_bytes:
+        
+        # Send first Byte to indicate new Package containing one byte
+        print("New Packadge:\t1")
+        laser.value(1)
+        indicator_led.value(1)
+        time.sleep(1/dtr)
+        
         print("Byte: '{1}' ({0})".format(byte, chr(byte)))
         
         # Cycle through byte, start by highest
