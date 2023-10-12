@@ -67,6 +67,11 @@ def send(recived_bytes):
             #
             time_remaining = time_remaining - 1/dtr
             time.sleep(1/dtr)
+            
+        # Pull low to ensure Package bit is send
+        laser.off()
+        indicator_led.off()
+        time.sleep(1/dtr)
         
         print('\n')
 

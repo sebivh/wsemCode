@@ -25,7 +25,7 @@ DATA_FILE_PATH = "data.csv"
 
 # Transmit Options
 is_reading = False
-dtr = 16 # Data Transfer Rate in bit/s
+dtr = 128 # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -123,8 +123,13 @@ def reciveMessage(reciver_adc):
         
         print("Wainting for Package Indicator")
         # Wait for Package Indicator Bit
-        while ((reciver_adc.read_u16() * ADC_CONV_FACTOR) <= SENSOR_THRESHOLD):
-            continue 
+        while True:
+            reading = reciver_adc.read_u16() * ADC_CONV_FACTOR
+            print(reading) 
+            if( reading > SENSOR_THRESHOLD):
+                break
+            time.sleep(1/(4*dtr))
+        
         print("New Package:")
         
         # Waiting
@@ -152,9 +157,7 @@ def reciveMessage(reciver_adc):
             time.sleep(1/dtr)
         
         # End Reading Byte, pushing it to Byte Array
-        start = time.time_ns()
         raw_message.append(recived_byte)
-        print("{0} Nanosekunden".format(time.time_ns() - start))
         print("\nByte: '{1}' ({0})".format(recived_byte, chr(recived_byte)))
         
         print('\n')
@@ -308,6 +311,7 @@ def webResponseGenerator(header, path, properties):
 
 try:
     onboard_led.off()
+    
     
     # Setup
     ap = network.WLAN(network.AP_IF)
