@@ -83,9 +83,9 @@ def save_data(byte_array):
     file = open(DATA_FILE_PATH, 'a')
     
     try:
-        encoded_msg = byte_array.decode('ascii')
+        encoded_msg = byte_array.decode('utf-8')
     except:
-        encoded_msg = "[Error] No Encoding with Ascii Possibile"
+        encoded_msg = "[Error] No Encoding with utf-8 Possibile"
     msg_len = len(byte_array)
     
     # Escape msg
@@ -200,10 +200,10 @@ def start_reciving_message():
             
             # Decode Message
             try:
-                msg = recived.decode('ascii')
+                msg = recived.decode('utf-8')
                 print('Recived Message:\n "{0}"'.format(msg))
             except:
-                print('Recived Message couldnt be decoded using Ascii')
+                print('Recived Message couldnt be decoded using utf-8')
             
             is_reading = False
         

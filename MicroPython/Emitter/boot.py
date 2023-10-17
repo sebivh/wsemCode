@@ -101,7 +101,7 @@ def webResponseGenerator(header, path, properties):
       transmitting_text = properties['data']
       
       # Convert to byte Array
-      msg_bytes = bytearray(properties['data'], 'ascii')
+      msg_bytes = bytearray(properties['data'], 'uft-8')
 
       # Append End Symbol
       msg_bytes.append(END_SYMBOLE)
@@ -184,6 +184,8 @@ def webResponseGenerator(header, path, properties):
     
 
 #================Start================
+
+send(b'abcdefghijklmnopqrstuvwxyzüöä')
 
 laser.off()
 onboard_led.off()
