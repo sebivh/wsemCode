@@ -19,13 +19,13 @@ print("Booting Reciver")
 
 
 # Consts
-ADC_CONV_FACTOR = 3.3/65535
+ADC_CONV_FACTOR = 3.3/65536
 SENSOR_THRESHOLD = 1
 DATA_FILE_PATH = "data.csv"
 
 # Transmit Options
 is_reading = False
-dtr = 128 # Data Transfer Rate in bit/s
+dtr = 64 # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -128,6 +128,10 @@ def reciveMessage(reciver_adc):
             print(reading) 
             if( reading > SENSOR_THRESHOLD):
                 break
+            # Check for Brake Button
+            if button.value() == 1:
+                print('\r\nInterupted by Button, returning the until now recived Message')
+                return raw_message
             time.sleep(1/(4*dtr))
         
         print("New Package:")
@@ -271,8 +275,6 @@ def webResponseGenerator(header, path, properties):
 
         for l in lines[:5]:
             collum = ""
-            
-            print(l)
             
             # Read the First Collum
             for c in l:
