@@ -1,4 +1,3 @@
-import codecs
 
 csvPath = ".\..\data.csv"
 
@@ -11,7 +10,7 @@ print("Welcher Text?")
 t = input()
 
 csvFile = open(csvPath, 'r')
-textFile = codecs.open('text' + t + '.txt', 'r', "utf-8")
+textFile = open('text' + t + '.txt', 'r', "utf-8")
 
 csv = csvFile.readlines()[2:]
 
@@ -47,7 +46,7 @@ for c in columns:
 
 # Read Text and Convert to bytes
 text = textFile.read()
-controlBytes = text.encode('utf-8')
+controlBytes = text.encode('charmap')
 
 textFile.close()
 csvFile.close()
