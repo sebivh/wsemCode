@@ -46,7 +46,7 @@ for c in columns:
 
 # Read Text and Convert to bytes
 text = textFile.read()
-controlBytes = text.encode('charmap')
+controlBytes = text.encode('utf-8')
 
 textFile.close()
 csvFile.close()

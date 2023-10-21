@@ -25,7 +25,7 @@ DATA_FILE_PATH = "data.csv"
 
 # Transmit Options
 is_reading = False
-dtr = 64 # Data Transfer Rate in bit/s
+dtr = 64  # Data Transfer Rate in bit/s
 END_SYMBOLE = int('00000100', 2) # 00000100
 
 # Pins
@@ -83,7 +83,7 @@ def save_data(byte_array):
     file = open(DATA_FILE_PATH, 'a')
     
     try:
-        encoded_msg = byte_array.decode('ascii')
+        encoded_msg = byte_array.decode('utf-8')
     except:
         encoded_msg = "[Error] No Encoding with ascii Possibile"
     msg_len = len(byte_array)
@@ -125,7 +125,6 @@ def reciveMessage(reciver_adc):
         # Wait for Package Indicator Bit
         while True:
             reading = reciver_adc.read_u16() * ADC_CONV_FACTOR
-            print(reading) 
             if( reading > SENSOR_THRESHOLD):
                 break
             # Check for Brake Button
@@ -200,7 +199,7 @@ def start_reciving_message():
             
             # Decode Message
             try:
-                msg = recived.decode('ascii')
+                msg = recived.decode('utf-8')
                 print('Recived Message:\n "{0}"'.format(msg))
             except:
                 print('Recived Message couldnt be decoded using ascii')

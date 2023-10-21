@@ -101,8 +101,8 @@ def webResponseGenerator(header, path, properties):
       transmitting_text = properties['data']
       
       # Convert to byte Array
-      msg_bytes = bytearray(properties['data'], 'ascii')
-
+      msg_bytes = bytearray(properties['data'], 'utf-8')
+      print(msg_bytes)
       # Append End Symbol
       msg_bytes.append(END_SYMBOLE)
               

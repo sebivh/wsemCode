@@ -6,4 +6,4 @@ adc = ADC(0)
 
 while True:
     print(round(adc.read_u16() * ADC_CONV_FACTOR - 0.03, 3))
-    time.sleep(1/16)
+    time.sleep(1/64)
