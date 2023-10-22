@@ -1,5 +1,8 @@
 
-csvPath = ".\..\data.csv"
+csvPath = "F:\\Schule\\WSeminar\\code\\MicroPython\\Analyse\\data.csv"
+csvFile = open(csvPath, 'r')
+csv = csvFile.readlines()[2:]
+csvFile.close()
 
 print("Welcher Eintrag aus der csv Datei?")
 z = int(input())
@@ -9,10 +12,6 @@ z -= 1
 print("Welcher Text?")
 t = input()
 
-csvFile = open(csvPath, 'r')
-textFile = open('text' + t + '.txt', 'r', "utf-8")
-
-csv = csvFile.readlines()[2:]
 
 l = csv[z]
 
@@ -45,13 +44,30 @@ for c in columns:
     dataBytes.append(int(c, base=2))
 
 # Read Text and Convert to bytes
+textFile = open("text" + t + ".txt", "r")
 text = textFile.read()
+textFile.close()
 controlBytes = text.encode('utf-8')
 
-textFile.close()
-csvFile.close()
-
-# Reduce control Bytes to correct size
-dataBytes = dataBytes[:-(len(dataBytes) - len(controlBytes))]
+correctBits = 0
+correctBytes = 0
 
 # Compare Bytearray's for BER
+for i in range(len(controlBytes)):
+    cb = controlBytes[i]
+    db = dataBytes[i]
+
+    # Count same Bit's
+    for m in range(8):
+        if ((cb & 1<<(7 - m)) != 0) == ((db & 1<<(7 - m)) != 0):
+            correctBits += 1
+
+    # Check if Bytes are the same
+    if db == cb:
+        correctBytes += 1
+
+# Calculate BER
+ber = correctBits/(len(controlBytes * 8))
+
+print("BER ist " + str(ber))
+print("Korrekt übertragene Zeichen: " + str(correctBytes) + " von insgesamt " + str(len(dataBytes)))
