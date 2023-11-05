@@ -24,6 +24,7 @@
 		"files.associations": {
 			"*.embeddedhtml": "html",
 			"udp.h": "c"
-		}
+		},
+		"cSpell.language": "en,de-DE,de"
 	}
 }
