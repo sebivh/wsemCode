@@ -1,5 +1,8 @@
 # Code Repository der Wissenschaftspropedeutischen Abschlussarbeit "KOMMUNIKATION MIT LIGHT AMPLIFICATION BY STIMULATED EMISSION OF RADIATION"
 von Sebastian von Helmersen
+
+Zugrunde liegende Arbeit: [sebivh.github.io/wsemCode/paper.pdf](https://sebivh.github.io/wsemCode/paper.pdf)
+
 ___
 In diesem Repository findet sich der Code für zwei selbstgebaute Datenübertragungseinrichtungen auf RP2040 basis.
 
